@@ -8,6 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "typecheck": "tsc",
     "build": "tsc",
+    "test": "tsx --test src/__tests__/*.test.ts",
     "start": "tsx src/index.ts"
   },
   "dependencies": {
