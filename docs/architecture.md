@@ -37,7 +37,7 @@
 |---|---|---|
 | 前端 | Vue 3 + Vite + TypeScript | Composition API，响应式数据流天然适合演播厅实时 UI |
 | 后端 | Node.js + Express + TypeScript | 前后端统一语言，SSE 原生支持好 |
-| 数据库 | SQLite (better-sqlite3) | 同步 API，零配置，单文件存储 |
+| 数据库 | SQLite (sql.js) | 纯 JavaScript/WebAssembly 实现，免原生编译（Windows 环境开箱即用），单文件存储 |
 | 实时通信 | SSE (Server-Sent Events) | 单向推送讨论事件流，比 WebSocket 更轻量 |
 | AI | DeepSeek V4 Pro API | 作业指定模型 |
 

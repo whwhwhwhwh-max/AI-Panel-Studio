@@ -84,8 +84,7 @@ Response 200:
     "name": "张维",
     "title": "资深媒体人 / 圆桌主持人",
     "stance": "中立引导者",
-    "color": "#C0C0C0",
-    "is_moderator": true
+    "color": "#C0C0C0"
   },
   "experts": [
     {
@@ -94,8 +93,7 @@ Response 200:
       "name": "林晓",
       "title": "AI 研究员 / 前 OpenAI 工程师",
       "stance": "AI 是工具，不会取代而是增强人类创造力",
-      "color": "#4A90D9",
-      "is_moderator": false
+      "color": "#4A90D9"
     }
     // ... 2-6 位专家
   ]

@@ -45,7 +45,7 @@ npm run dev        # http://localhost:5173
 |---|---|
 | 前端 | Vue 3 + Vite + TypeScript |
 | 后端 | Node.js + Express + TypeScript |
-| 数据库 | SQLite (better-sqlite3) |
+| 数据库 | SQLite (sql.js) |
 | 实时通信 | SSE (Server-Sent Events) |
 | AI | DeepSeek V4 Pro |
 

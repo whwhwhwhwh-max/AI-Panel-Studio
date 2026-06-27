@@ -34,7 +34,6 @@ erDiagram
         TEXT title "职业/Title"
         TEXT stance "立场简述"
         TEXT color "HEX颜色"
-        INTEGER is_moderator "0|1"
         TEXT created_at "ISO 8601"
     }
 
