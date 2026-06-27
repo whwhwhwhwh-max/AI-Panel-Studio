@@ -134,6 +134,108 @@
 
 ---
 
+## Prompt 7: 后端 API 构建与逐步验证 (TDD)
+
+**阶段**: TDD — Test-Driven Development
+
+**对话概要**:
+> 现在需要测试刚创建的 API。请启动后端，用 curl 依次验证每个端点：
+> - `GET /api/v1/health` 确认服务启动
+> - `GET /api/v1/discussions` 确认返回 5 条 seed 数据
+> - `GET /api/v1/discussions/:id` 确认含 panelists
+> - `POST /api/v1/panelists/generate` 确认 mock fallback 返回 1 moderator + N experts
+> - `POST /api/v1/discussions` 确认创建 discussion 成功并返回 201
+> - `POST /api/v1/discussions/:id/start-ai-demo` 确认：无 SSE 客户端时返回 clientCount=0、无 panelists 时返回 400、不存在的 discussion 返回 404
+> - `GET /api/v1/discussions/:id/events` 确认 SSE 连接建立 + connected 事件
+> - `GET /api/v1/discussions/:id/transcript`、`consensus`、`conflicts`、`summary` 确认各子资源端点正常
+>
+> 如果任何端点返回异常，修到通过为止。同时跑 `npm run build`（tsc + vue-tsc + vite build），确认零 TypeScript 错误。
+
+**验证流程**:
+每个端点用 curl 发出请求 → 检查 HTTP Status Code → 检查响应 JSON 结构 → 确认字段类型和值范围。关键边界 case 逐一覆盖：
+- `POST /panelists/generate` 缺 topic → 400
+- `POST /panelists/generate` expert_count=1 → 400（不在 2-6 范围）
+- `POST /discussions` panelists 数量不对 → 400
+- `GET /discussions/:id` 不存在的 UUID → 404
+- `POST /discussions/:id/start-ai-demo` 讨论无 panelists → 400
+
+**产出**: 12 个端点全部验证通过。Backend `tsc` 和 Frontend `vue-tsc + vite build` 均零错误。构建流程作为每次 commit 前的强制检查点，确保不引入类型错误。
+
+**作用**: 这是贯穿整个开发周期的持续做法——每完成一个后端模块，立即用 curl 做"穷尽式"验证，而不是等到最后才集中测试。边界 case 的覆盖优先于正常路径——先测 400/404，再测 200/201，确保错误处理不是事后补丁而是第一公民。这种 "API-first TDD" 风格让每个 commit 都有明确的可验证产出。
+
+---
+
+## Prompt 8: 完整用户流程端到端验证 (E2E)
+
+**阶段**: E2E — End-to-End Testing
+
+**对话概要**:
+> 现在验证完整用户流程：打开前端 → 首页看到 5 条讨论 → 点击"发起新讨论" → 输入话题 + 调滑块到 3 位专家 → 点击"生成嘉宾阵容" → 确认页看到 1 主持人 + 3 专家卡片（姓名/职业/立场/颜色）→ 点击"确认进入演播厅" → 进入 StudioView → 点击"启动 AI 讨论"（无 API Key 时 fallback 到 mock）→ SSE 实时推送 discussion_started → speaker_status × 4-6 → transcript_delta × 4-6 → consensus_updated → discussion_finished → UI 各区域同步更新。
+>
+> 同时验证错误路径：话题为空时生成按钮 disabled、生成失败时显示错误消息、返回修改重新生成嘉宾、演播厅"返回"按钮回到首页。每个步骤截图或记录控制台输出。
+
+**端到端流程**:
+```
+Browser: http://localhost:5173
+  → 首页加载 5 条 seed discussions（created/ready/running/finished 各状态徽标）
+  → 点击"🎙️ 发起新讨论"
+  → 输入 "AI 是否会取代人类创造力？"，滑块调至 3
+  → 点击"🎯 生成嘉宾阵容"（POST /panelists/generate → mock fallback）
+  → 确认页：4 张卡片（1 主持人 "陈文远" + 3 专家 "李雅文/王峰/赵思远"）
+  → 点击"🎬 确认进入演播厅"（POST /discussions → 201 → 跳转 StudioView）
+  → StudioView 加载：左侧嘉宾阵容列表，中间空 transcript，右侧空共识/分歧
+  → SSE connected 指示灯亮
+  → 点击"🤖 启动 AI 讨论"（POST /start-ai-demo → 200, source="mock"）
+  → Transcript 面板逐条新增发言（800ms 间隔）：
+       [主持人] 陈文远: "感谢各位专家今天的参与..."
+       [专家] 李雅文: "工程实践表明..."
+       [专家] 王峰: "现有方案在...方面..."
+       [专家] 赵思远: "从学术视角看..."
+  → 共识面板出现 1-2 条
+  → 讨论结束 → "✅ 讨论已结束"
+  → 点击"← 返回" → 回到首页，新创建的 discussion 出现在列表顶部
+```
+
+**产出**: 全流程无报错，6 个 HTTP 请求均成功，SSE 实时推送 8-14 个事件，UI 4 个区域（嘉宾/transcript/共识/状态）同步响应。前端构建 zero-error。
+
+**作用**: E2E 验证在每次大功能完成后立即执行——不是在"所有代码都写完"之后。这确保了每个 Phase 结束时整个链路都是 working end-to-end，而不是"后端 self-contained 通过 + 前端 self-contained 通过 = 组合后未知"。最关键的发现是：mock fallback 的双按钮设计（AI + Mock 分别调用）让无 API Key 环境也能完整走通全流程，这个设计决策让项目在任何环境下都能 demo。
+
+---
+
+## Prompt 9: 交付包装与文档就绪检查 (Delivery)
+
+**阶段**: Delivery — Final Packaging
+
+**对话概要**:
+> 现在进入交付阶段，不再新增业务功能。请执行以下检查清单：
+> 1. git status 确认 working tree clean，无 node_modules、dist、.env、*.db 等脏文件
+> 2. `frontend npm run build` 和 `backend npm run build` 均 zero-error
+> 3. README.md 包含快速开始步骤（clone → cp .env.example → npm install → db:init → db:seed → dev）
+> 4. .env.example 标注了所有必需变量，API Key 标注为可选
+> 5. 编写 core prompt log（≥6 段），标注每个 Prompt 的阶段、目的和产出
+> 6. 最终 git log 线性历史，每个 commit 职责单一
+> 7. 列出全部 45 个 project files
+>
+> 然后补充 3 段 TDD / E2E / Delivery 的 Prompt 记录到 prompt-log.md。
+
+**交付物清单**:
+
+| 类别 | 交付物 | 状态 |
+|---|---|---|
+| 源码 | 45 个 project files（不含 node_modules/dist/.env） | ✅ |
+| 数据库 | `init.sql`（7 张表 DDL）+ `seed.sql`（5 条种子数据，覆盖 4 种状态） | ✅ |
+| 后端 | 12 个 API 端点（6 GET + 3 POST + 1 SSE + 2 demo） | ✅ |
+| 前端 | 4 个 View 组件（Home / Create / Confirm / Studio），1 个 API client | ✅ |
+| AI | DeepSeek 嘉宾生成 + 讨论生成，双路径 mock fallback，5 层校验 | ✅ |
+| 文档 | 8 份：PRD / Architecture / Schema / ER / API / Dev Plan / Prompt Log / README | ✅ |
+| 会话记录 | 2 份 Session Summary（Session 1 + Session 2） | ✅ |
+| Git | 13 commits，线性历史，无 merge | ✅ |
+| 构建 | `tsc` + `vue-tsc` + `vite build` 全部 zero-error | ✅ |
+
+**作用**: 交付检查不是"最后一天"才做的事。从第一个 commit 起，每次 `git add` 前都确认 (a) 不走漏 node_modules/dist/.env (b) 双端 build 通过 (c) commit 粒度合理。这些习惯让最终交付变成了一个"确认清单"而非"补救清单"。Prompt Log 的 9 段记录也构成了项目的"设计考古层"——任何一个新加入的开发者都可以从这 9 段记录中理解"为什么这样设计"而非仅仅"代码长什么样"。
+
+---
+
 ## 各阶段 Prompt 总结
 
 | # | 阶段 | Prompt 用途 | 产出 |
@@ -144,6 +246,9 @@
 | 4 | SDD | Persisted vs Runtime 事件分层 | 混合持久化策略 + 断线重连方案 |
 | 5 | AI Integration | DeepSeek 多级 Fallback + JSON 生成 | AI + Mock 双路径嘉宾生成 |
 | 6 | AI Integration | 讨论内容 Prompt Engineering + Panelist Roster 约束 | 讨论 Demo 生成 + 校验链 |
+| 7 | TDD | 后端 API 构建验证 + curl 逐接口测试 | 12 个端点全部 200/201/404/400 |
+| 8 | E2E | 完整用户流程端到端验证 | 首页 → 创建 → 生成 → 确认 → 演播厅 |
+| 9 | Delivery | README + 运行说明 + 最终交付检查 | 45 文件、13 commits、clean tree |
 
 ---
 
