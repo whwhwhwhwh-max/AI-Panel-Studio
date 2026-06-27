@@ -1,10 +1,7 @@
 <template>
-  <div class="scaffold">
-    <h1>AI Panel Studio</h1>
-    <p>Frontend scaffold ready</p>
-  </div>
+  <HomeView />
 </template>
 
 <script setup lang="ts">
-// Scaffold — business components TBD
+import HomeView from '@/views/HomeView.vue'
 </script>

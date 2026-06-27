@@ -15,6 +15,11 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
 
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true
