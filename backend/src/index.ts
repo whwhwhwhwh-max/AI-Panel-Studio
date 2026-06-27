@@ -1,6 +1,8 @@
 import 'dotenv/config'
 import express from 'express'
 import cors from 'cors'
+import { initDatabase } from './db/index.js'
+import discussionRoutes from './routes/discussionRoutes.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
@@ -9,6 +11,9 @@ const PORT = parseInt(process.env.PORT || '3000', 10)
 app.use(cors())
 app.use(express.json())
 
+// ── Init Database ────────────────────────────────────────
+await initDatabase()
+
 // ── Routes ────────────────────────────────────────────────
 app.get('/api/v1/health', (_req, res) => {
   res.json({
@@ -16,6 +21,18 @@ app.get('/api/v1/health', (_req, res) => {
     service: 'ai-panel-studio-backend',
     version: '0.1.0',
     timestamp: new Date().toISOString(),
+  })
+})
+
+app.use('/api/v1/discussions', discussionRoutes)
+
+// ── 404 ───────────────────────────────────────────────────
+app.use((_req, res) => {
+  res.status(404).json({
+    error: {
+      code: 'NOT_FOUND',
+      message: 'The requested resource was not found',
+    },
   })
 })
 
