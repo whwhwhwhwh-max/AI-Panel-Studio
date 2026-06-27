@@ -425,6 +425,14 @@ body {
   cursor: not-allowed;
 }
 
+.btn-ai {
+  background: #2980b9;
+}
+
+.btn-ai:hover:not(:disabled) {
+  background: #1a6fa0;
+}
+
 .finished-notice {
   font-size: 0.95rem;
   font-weight: 600;

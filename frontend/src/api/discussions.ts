@@ -72,3 +72,17 @@ export async function triggerMockEvents(id: string): Promise<void> {
     throw new Error(`Failed to trigger mock events: ${res.status} ${res.statusText}`)
   }
 }
+
+export async function startAIDemo(id: string): Promise<{ source: string; eventCount: number }> {
+  const res = await fetch(
+    `/api/v1/discussions/${encodeURIComponent(id)}/start-ai-demo`,
+    { method: 'POST' }
+  )
+  if (!res.ok) {
+    const err = await res.json().catch(() => null)
+    throw new Error(
+      err?.error?.message ?? `Failed to start AI demo: ${res.status} ${res.statusText}`
+    )
+  }
+  return res.json()
+}

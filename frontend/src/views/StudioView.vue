@@ -85,11 +85,19 @@
       <div class="studio-actions">
         <button
           v-if="!discussionStarted"
+          class="btn-simulate btn-ai"
+          @click="startAIDiscussion"
+          :disabled="simulating"
+        >
+          {{ simulating ? 'AI 讨论进行中……' : '🤖 启动 AI 讨论' }}
+        </button>
+        <button
+          v-if="!discussionStarted"
           class="btn-simulate"
           @click="startSimulation"
           :disabled="simulating"
         >
-          {{ simulating ? '模拟进行中……' : '🎬 启动模拟讨论' }}
+          {{ simulating ? '模拟进行中……' : '🎬 启动 Mock 讨论' }}
         </button>
         <div v-if="discussionFinished" class="finished-notice">
           ✅ 讨论已结束
@@ -104,7 +112,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { fetchDiscussionById, triggerMockEvents } from '@/api/discussions'
+import { fetchDiscussionById, triggerMockEvents, startAIDemo } from '@/api/discussions'
 import type { DiscussionDetail, DiscussionStatus } from '@/types'
 
 const props = defineProps<{ discussionId: string }>()
@@ -210,6 +218,16 @@ function getColorForPanelist(panelistId: string): string {
 }
 
 // ── Actions ──────────────────────────────────
+
+async function startAIDiscussion() {
+  simulating.value = true
+  try {
+    await startAIDemo(props.discussionId)
+  } catch (e) {
+    console.error('Failed to start AI discussion', e)
+    simulating.value = false
+  }
+}
 
 async function startSimulation() {
   simulating.value = true

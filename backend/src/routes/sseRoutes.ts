@@ -9,6 +9,8 @@ import {
   getClientCount,
 } from '../sse/sseManager.js'
 import { findDiscussionById } from '../repositories/discussionRepository.js'
+import { generateDiscussionDemo } from '../ai/discussionGenerationService.js'
+import type { SSEEvent } from '../sse/sseManager.js'
 
 const router = Router()
 
@@ -152,6 +154,85 @@ router.post('/:id/mock-events', (req, res) => {
     clientCount,
     eventTypes: mockEvents.map((e) => e.event),
   })
+})
+
+// ── POST /api/v1/discussions/:id/start-ai-demo ─
+// Generate a complete discussion demo (AI or mock fallback)
+// and push events through SSE.
+
+router.post('/:id/start-ai-demo', async (req, res) => {
+  const discussionId = req.params.id
+
+  const discussion = findDiscussionById(discussionId)
+  if (!discussion) {
+    return res.status(404).json({
+      error: {
+        code: 'DISCUSSION_NOT_FOUND',
+        message: `Discussion ${discussionId} not found`,
+      },
+    })
+  }
+
+  if (!discussion.panelists || discussion.panelists.length === 0) {
+    return res.status(400).json({
+      error: {
+        code: 'NO_PANELISTS',
+        message: 'Discussion has no panelists. Generate panelists first.',
+      },
+    })
+  }
+
+  const clientCount = getClientCount(discussionId)
+  if (clientCount === 0) {
+    return res.status(200).json({
+      message: 'No SSE clients connected. Open the studio page first.',
+      clientCount: 0,
+    })
+  }
+
+  try {
+    const result = await generateDiscussionDemo(discussion, discussion.panelists)
+
+    // Broadcast discussion_started first
+    broadcast(discussionId, {
+      event: 'discussion_started',
+      data: {
+        discussion_id: discussionId,
+        topic: discussion.topic,
+        moderator: discussion.panelists.find((p) => p.role === 'moderator') ?? null,
+        started_at: new Date().toISOString(),
+        source: result.source,
+      },
+    })
+
+    // Send remaining events sequentially with 800ms delay
+    let delay = 800
+    for (const ev of result.events) {
+      const sseEvent: SSEEvent = {
+        event: ev.type,
+        data: ev,
+      }
+      setTimeout(() => {
+        broadcast(discussionId, sseEvent)
+      }, delay)
+      delay += 800
+    }
+
+    res.status(200).json({
+      message: `AI demo queued (source: ${result.source}). Delivering ${result.events.length} events to ${clientCount} client(s).`,
+      clientCount,
+      source: result.source,
+      eventCount: result.events.length,
+    })
+  } catch (err) {
+    console.error('[start-ai-demo] Unexpected error:', err)
+    res.status(500).json({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to generate discussion demo',
+      },
+    })
+  }
 })
 
 export default router
