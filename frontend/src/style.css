@@ -1,0 +1,40 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  color: #2c3e50;
+  background-color: #f5f7fa;
+}
+
+.scaffold {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+}
+
+.scaffold h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.scaffold p {
+  font-size: 1.125rem;
+  color: #7f8c8d;
+}
