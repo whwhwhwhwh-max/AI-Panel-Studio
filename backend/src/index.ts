@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { initDatabase } from './db/index.js'
 import discussionRoutes from './routes/discussionRoutes.js'
+import sseRoutes from './routes/sseRoutes.js'
 
 const app = express()
 const PORT = parseInt(process.env.PORT || '3000', 10)
@@ -25,6 +26,7 @@ app.get('/api/v1/health', (_req, res) => {
 })
 
 app.use('/api/v1/discussions', discussionRoutes)
+app.use('/api/v1/discussions', sseRoutes)
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((_req, res) => {
