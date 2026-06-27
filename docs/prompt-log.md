@@ -222,17 +222,30 @@ Browser: http://localhost:5173
 
 | 类别 | 交付物 | 状态 |
 |---|---|---|
-| 源码 | 45 个 project files（不含 node_modules/dist/.env） | ✅ |
+| 源码 | 47 个 project files（不含 node_modules/dist/.env） | ✅ |
 | 数据库 | `init.sql`（7 张表 DDL）+ `seed.sql`（5 条种子数据，覆盖 4 种状态） | ✅ |
 | 后端 | 12 个 API 端点（6 GET + 3 POST + 1 SSE + 2 demo） | ✅ |
 | 前端 | 4 个 View 组件（Home / Create / Confirm / Studio），1 个 API client | ✅ |
 | AI | DeepSeek 嘉宾生成 + 讨论生成，双路径 mock fallback，5 层校验 | ✅ |
 | 文档 | 8 份：PRD / Architecture / Schema / ER / API / Dev Plan / Prompt Log / README | ✅ |
 | 会话记录 | 2 份 Session Summary（Session 1 + Session 2） | ✅ |
-| Git | 13 commits，线性历史，无 merge | ✅ |
+| Git | 16 commits，线性历史，无 merge | ✅ |
 | 构建 | `tsc` + `vue-tsc` + `vite build` 全部 zero-error | ✅ |
 
 **作用**: 交付检查不是"最后一天"才做的事。从第一个 commit 起，每次 `git add` 前都确认 (a) 不走漏 node_modules/dist/.env (b) 双端 build 通过 (c) commit 粒度合理。这些习惯让最终交付变成了一个"确认清单"而非"补救清单"。Prompt Log 的 9 段记录也构成了项目的"设计考古层"——任何一个新加入的开发者都可以从这 9 段记录中理解"为什么这样设计"而非仅仅"代码长什么样"。
+
+---
+
+## 交付后 Review (Superpowers)
+
+本项目使用 **Superpowers**（Claude Code CLI 开发流程插件）进行交付前 review。Superpowers 不是运行时依赖——它只是 Claude Code 的开发辅助工具，项目本身的运行完全不依赖它。
+
+Review 覆盖：
+- 文档完整性：8 份文档（PRD / Architecture / Schema / ER / API / Dev Plan / Prompt Log / Testing）+ 2 份 Session Summary
+- Prompt Log：9 段核心 Prompt，完整覆盖 SDD / DDD / TDD / E2E / AI Integration / Delivery
+- 构建：Backend `tsc` + Frontend `vue-tsc + vite build` 双端 zero-error
+- Git：16 commits，线性无 merge
+- 技术栈确认：Vue 3 + Express + sql.js + SSE + DeepSeek fallback
 
 ---
 
@@ -248,7 +261,7 @@ Browser: http://localhost:5173
 | 6 | AI Integration | 讨论内容 Prompt Engineering + Panelist Roster 约束 | 讨论 Demo 生成 + 校验链 |
 | 7 | TDD | 后端 API 构建验证 + curl 逐接口测试 | 12 个端点全部 200/201/404/400 |
 | 8 | E2E | 完整用户流程端到端验证 | 首页 → 创建 → 生成 → 确认 → 演播厅 |
-| 9 | Delivery | README + 运行说明 + 最终交付检查 | 45 文件、13 commits、clean tree |
+| 9 | Delivery | README + 运行说明 + 最终交付检查 | 47 files、16 commits、clean tree |
 
 ---
 

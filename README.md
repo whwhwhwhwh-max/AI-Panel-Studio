@@ -155,7 +155,18 @@ AI-Panel-Studio/
 | Phase 3 | TDD + AI Integration | DeepSeek 接入 + Mock Fallback + AI 讨论 Demo |
 | Phase 4 | Delivery | Prompt Log + Testing Guide + README |
 
-Git 提交历史保留完整开发演进（15 commits，线性无 merge）。
+Git 提交历史保留完整开发演进（16 commits，线性无 merge）。
+
+### 交付前 Review
+
+本项目使用 **Superpowers**（Claude Code 开发流程插件）进行交付前 review / checklist 检查，确保：
+- 文档完整性（PRD / Architecture / Schema / ER / API / 开发计划）
+- Prompt Log 覆盖 SDD / DDD / TDD / E2E / Delivery 各阶段
+- 构建零错误（`backend tsc` + `frontend vue-tsc + vite build`）
+- Git 历史清晰、commit 职责单一
+- 测试流程说明完整（API / SSE / Fallback / E2E / 边界）
+
+> **说明**: Superpowers 是 Claude Code 的 CLI 开发流程插件，不是运行时依赖。项目运行仍基于 Vue 3 + Express + sql.js + SSE + DeepSeek fallback。
 
 ---
 

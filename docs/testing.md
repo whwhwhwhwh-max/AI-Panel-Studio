@@ -2,6 +2,8 @@
 
 > 版本: v1.0 | 日期: 2026-06-27 | 状态: MVP
 
+> **Review 工具**: 本项目使用 **Superpowers**（Claude Code CLI 开发流程插件）进行交付前 review / checklist 检查。Superpowers 不是运行时依赖——项目运行仍基于 Vue 3 + Express + sql.js + SSE + DeepSeek fallback。
+
 ---
 
 ## 一、构建测试
