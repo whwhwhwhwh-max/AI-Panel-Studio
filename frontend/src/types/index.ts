@@ -77,3 +77,38 @@ export interface SSEEvent {
   event?: string
   data: string
 }
+
+// ── Generate Panelists ─────────────────────
+
+export interface GeneratePanelistsRequest {
+  topic: string
+  expert_count: number
+}
+
+export interface GeneratedPanelist {
+  role: PanelistRole
+  name: string
+  title: string
+  stance: string
+  color: string
+}
+
+export interface GeneratePanelistsResponse {
+  topic: string
+  expert_count: number
+  panelists: GeneratedPanelist[]
+}
+
+// ── Create Discussion ──────────────────────
+
+export interface CreateDiscussionRequest {
+  topic: string
+  expert_count: number
+  panelists: {
+    name: string
+    title: string
+    stance: string
+    color: string
+    role: PanelistRole
+  }[]
+}

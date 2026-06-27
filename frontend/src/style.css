@@ -48,6 +48,28 @@ body {
   min-height: 200px;
 }
 
+/* ── Home Actions ──────────────────────── */
+
+.home-actions {
+  margin-bottom: 1.25rem;
+}
+
+.btn-new-discussion {
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: #3498db;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-new-discussion:hover {
+  background: #2980b9;
+}
+
 /* ── State messages ───────────────────── */
 
 .state-message {

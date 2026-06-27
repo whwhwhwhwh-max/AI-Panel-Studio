@@ -112,3 +112,36 @@ export interface ApiError {
     message: string
   }
 }
+
+// ── Request / Response helpers ───────────────
+
+export interface GeneratePanelistsRequest {
+  topic: string
+  expert_count: number  // 2-6
+}
+
+export interface GeneratedPanelist {
+  role: PanelistRole
+  name: string
+  title: string
+  stance: string
+  color: string
+}
+
+export interface GeneratePanelistsResponse {
+  topic: string
+  expert_count: number
+  panelists: GeneratedPanelist[]
+}
+
+export interface CreateDiscussionRequest {
+  topic: string
+  expert_count: number
+  panelists: {
+    name: string
+    title: string
+    stance: string
+    color: string
+    role: PanelistRole
+  }[]
+}

@@ -6,6 +6,13 @@
     </header>
 
     <main class="home-main">
+      <!-- Action bar -->
+      <div class="home-actions">
+        <button class="btn-new-discussion" @click="$emit('create-discussion')">
+          🎙️ 发起新讨论
+        </button>
+      </div>
+
       <!-- Loading -->
       <div v-if="loading" class="state-message">
         <p>加载中……</p>
@@ -69,6 +76,7 @@ async function load() {
 
 const emit = defineEmits<{
   (e: 'discussion-selected', id: string): void
+  (e: 'create-discussion'): void
 }>()
 
 function handleClick(d: Discussion) {

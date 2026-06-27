@@ -3,6 +3,8 @@ import express from 'express'
 import cors from 'cors'
 import { initDatabase } from './db/index.js'
 import discussionRoutes from './routes/discussionRoutes.js'
+import discussionWriteRoutes from './routes/discussionWriteRoutes.js'
+import panelistRoutes from './routes/panelistRoutes.js'
 import sseRoutes from './routes/sseRoutes.js'
 
 const app = express()
@@ -26,7 +28,9 @@ app.get('/api/v1/health', (_req, res) => {
 })
 
 app.use('/api/v1/discussions', discussionRoutes)
+app.use('/api/v1/discussions', discussionWriteRoutes)
 app.use('/api/v1/discussions', sseRoutes)
+app.use('/api/v1/panelists', panelistRoutes)
 
 // ── 404 ───────────────────────────────────────────────────
 app.use((_req, res) => {
