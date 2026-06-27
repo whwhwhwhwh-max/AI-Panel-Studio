@@ -67,8 +67,12 @@ async function load() {
   }
 }
 
+const emit = defineEmits<{
+  (e: 'discussion-selected', id: string): void
+}>()
+
 function handleClick(d: Discussion) {
-  console.log(d.id)
+  emit('discussion-selected', d.id)
 }
 
 function statusLabel(s: DiscussionStatus): string {
